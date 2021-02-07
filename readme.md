@@ -9,6 +9,13 @@ It's my personal challenge write text user interface library for python. Which b
 * Color holder [ColorPair]:
     - [x] Background and foreground color.
 	- [x] Automatic unique color ID generation on object create time.
+* Cursor [Cursor]:
+    - [x] Coordinates, relative to parent element.
+	- [x] Use arrow keys to move cursor.
+	- [x] Type (linear, point, ...).
+	    - Line - By default cursor is on firs column of line and move only up/down.
+		- Free - Can move free in parent element.
+		- Point - Use y,x to determine cursor location.
 * Screen container [TUI]:
     - [x] Default screen initialization. 
 * ScrollPad:
@@ -18,8 +25,3 @@ It's my personal challenge write text user interface library for python. Which b
 	- [ ] One line and multi line string support.
 	- [ ] Calculate height and width of element from content.
 	- [ ] Foreground and background color.
-* Cursor:
-    - [ ] Coordinates, relative to parent element.
-	- [ ] Type (linear, point, ...).
-	    - Linear - By default cursor is on firs element of line.
-		- Point - Use coordinates to determine cursor location.
