@@ -1,43 +1,50 @@
 import curses
-from comp import Color, ColorPair, Cursor
+from comp import Color, ColorPair, Cursor, UIElement, UIContainer
 
 
-class UIElement():
-    """ Common class for all interface elements. """
-    def __init__(self, y=0, x=0, height=0, width=0, color=None, cursor=None, box=False):
-        self._ce = None
-        self.y = y
-        self.x = x
-        self.height = height
-        self.width = width
-        self.color = color
-        self.cursor = cursor
-        self._box = box
+class Label(UIElement):
+    """ Text label.
+    Args:
+        text (str): Label text.
+        *args: Argument list.
+        **kwargs: Keyword argument list.
+    """
+    def __init__(self, text, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._text = None
+        self.text = text
 
     @property
-    def box(self):
-        return self._box
+    def text(self):
+        """ Get label text.
+        Returns:
+            str: Label text.
+        """
+        return self._text
 
-    @box.setter
-    def box(self, val):
-        if self._box is False and self.cursor is not None:
-            self.cursor.y += 1
-            self.cursor.x += 1
+    @text.setter
+    def text(self, text):
+        """ Set label text.
+        Args:
+            text (str): Label text.
+        """
+        self._text = text
 
-        self._box = val
+        # Calculate label element size from suplied text.
+        self.width = len(max(text.splitlines(keepends=True)))
+        self.height = len(text.splitlines(keepends=True))
 
-    def _render(self, key):
-        if self.box:
-            self._ce.box()
+    def _render(self):
+        """ Render label text.
+        If text is multiline split it into separate lines and render with incremental y position.
+        """
+        for i, st in enumerate(self.text.splitlines(keepends=True)): 
+            self._parent._cr.addstr(self.y + i, self.x, st)
 
-        # Set current element cursor.
-        if self.cursor is not None:
-            self.cursor._render(self, key)  # Render on current element.
-        else:
-            curses.curs_set(0)  # Hide cursor.
+        super()._render()
 
 
-class TUI(UIElement):
+class TUI(UIContainer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -45,30 +52,29 @@ class TUI(UIElement):
         curses.wrapper(self._run)
 
     def _run(self, scr):
-        self._ce = scr
+        self._cr = scr
         self.height, self.width = scr.getmaxyx()
-
+        
         # Colors init area.
         if self.color is not None:
             curses.init_pair(self.color._number, self.color.fg, self.color.bg)
-            self._ce.bkgd(curses.color_pair(self.color._number))
+            self._cr.bkgd(curses.color_pair(self.color._number))
 
-        self._ce.nodelay(True)
-        self._ce.timeout(100)    # Key read timeout.
+        self._cr.nodelay(True)
+        self._cr.timeout(100)    # Key read timeout.
 
-        key = None
         # i = 0
-        while(key != ord("q")):
+        while(self._key != ord("q")):
             # Read key input.
-            key = self._ce.getch()
+            self._key = self._cr.getch()
 
-            if key != curses.ERR:
+            if self._key != curses.ERR:
                 pass
 
             # self._ce.addstr(self.height - 3, 1, str(i))
             # self._ce.addstr(self.height - 2, 1, str(key))
 
-            self._render(key)
+            self._render()
             # i += 1
             # scr.noutrefresh()
             # curses.doupdate()
@@ -76,6 +82,7 @@ class TUI(UIElement):
 
 
 if __name__ == "__main__":
-    tui = TUI(color=ColorPair(Color.BLACK, Color.BLUE),
-              cursor=Cursor(mode=Cursor.FREE))
+    tui = TUI(color=ColorPair(Color.BLACK, Color.BLUE), box=True)
+    tui.add(Label("Short line.", y=5, x=8, cursor=Cursor(mode=Cursor.FREE)))
+    tui.add(Label("Multiline\nhere.", y=7, x=8, cursor=Cursor(mode=Cursor.FREE)))
     tui.run()
