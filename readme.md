@@ -2,7 +2,7 @@
 It's my challenge write text user interface library for python. Which be suitable for my needs and requirements. Interest part that all development and testing done on Android phone terminal.
 
 
-##### Oh what's a plan.
+#### Oh what's a plan.
 - [ ] Root UI element [UIElement].
 - [x] Color holder [ColorPair].
 - [x] Cursor [Cursor].
@@ -10,5 +10,6 @@ It's my challenge write text user interface library for python. Which be suitabl
 - [ ] Screen container [TUI]. 
 - [ ] ScrollPad.
 - [ ] Text label [Label].
+- [x] Matrix to hold and arange container child elements [ElementsMatrix].
 
 More details can be found in [Initial version.](https://github.com/CutePotatoDev/TUI/projects/2)
